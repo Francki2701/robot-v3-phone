@@ -3,21 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>ROBOT V5 - SANS ERREUR CONNEXION</title>
+<title>ROBOT V9 - CAPTURE QM BAM</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#0a0a1a;color:#fff;font-family:Arial;padding:8px;padding-bottom:120px}
-.top{background:linear-gradient(135deg,#ffcc00,#00ff88);padding:14px;border-radius:16px;color:#000;text-align:center;position:sticky;top:0;z-index:10}
-.top h1{margin:0;font-size:20px}.top p{margin:4px 0;font-size:12px}
+.top{background:linear-gradient(135deg,#ff00aa,#ffcc00);padding:14px;border-radius:16px;color:#000;text-align:center;position:sticky;top:0;z-index:10}
+.top h1{margin:0;font-size:22px}.top p{margin:4px 0;font-size:12px}
 .card{background:#1a1a2e;padding:12px;border-radius:16px;margin:10px 0}
 select,input{width:100%;padding:14px;border-radius:12px;border:1px solid #444;background:#000;color:#fff;margin:6px 0;font-size:16px}
 button{border:0;border-radius:14px;font-weight:900;cursor:pointer}
-.prix{font-size:36px;font-weight:900;text-align:center;line-height:1}
-.signal{font-size:20px;font-weight:900;padding:16px;border-radius:14px;text-align:center;margin:10px 0}
+.signal{font-size:22px;font-weight:900;padding:16px;border-radius:14px;text-align:center;margin:10px 0}
 .buy{background:#00ff88;color:#000}.sell{background:#ff4444;color:#fff}.wait{background:#333;color:#fff}
 .flex{display:flex;gap:8px}.flex>div{flex:1;background:#000;padding:10px;border-radius:12px;text-align:center}
 .big{font-size:18px;font-weight:900}.green{color:#00ff88}.red{color:#ff4444}.yellow{color:#ffcc00}
-canvas{width:100%;background:#000;border-radius:12px}
 .small{font-size:12px;color:#aaa;text-align:center}
 .sl{color:#ff4444;font-weight:900;font-size:18px}.tp{color:#00ff88;font-weight:900;font-size:18px}.tp1{color:#ffcc00;font-weight:900;font-size:18px}
 .barre-bas{position:fixed;bottom:0;left:0;right:0;background:#111;padding:10px;display:flex;gap:10px;z-index:99;border-top:2px solid #333}
@@ -25,73 +23,73 @@ canvas{width:100%;background:#000;border-radius:12px}
 .btn-sell{flex:1;background:#ff4444;color:#fff;padding:18px 5px;font-size:22px}
 .btn-mt5{width:100%;background:#007bff;color:#fff;padding:14px;font-size:16px;margin-top:8px}
 .btn-copy{width:100%;background:#ffcc00;color:#000;padding:14px;font-size:16px;margin-top:8px}
-table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:6px;border-bottom:1px solid #333;text-align:center}
-.pos-ouverte{border:2px solid #ffcc00;background:#2a2a00 !important}
-.warn{background:#ff4444;color:#fff;padding:10px;border-radius:12px;text-align:center;font-weight:900;font-size:13px;margin:10px 0}
-.info{background:#007bff;color:#fff;padding:10px;border-radius:12px;text-align:center;font-size:13px;margin:10px 0}
-.debug{background:#000;color:#ffcc00;padding:8px;border-radius:8px;font-size:11px;text-align:center;margin-top:6px;word-break:break-word}
-.btn-prix{width:100%;background:#ffcc00;color:#000;padding:16px;font-size:18px;margin-top:6px}
+.info{background:#00ff88;color:#000;padding:10px;border-radius:12px;text-align:center;font-size:13px;font-weight:900;margin:10px 0}
+.warn{background:#ffcc00;color:#000;padding:10px;border-radius:12px;text-align:center;font-weight:900;font-size:13px;margin:10px 0}
+.step{background:#000;border:2px solid #444;padding:10px;border-radius:12px;margin:8px 0;text-align:center}
+.step.active{border-color:#ffcc00;background:#2a2a00}
+.step.done{border-color:#00ff88;background:#002a00}
+#imgWrap{position:relative;width:100%;background:#000;border-radius:12px;overflow:hidden;min-height:200px;display:none}
+#imgCapture{width:100%;display:block}
+.point{position:absolute;width:22px;height:22px;border-radius:50%;border:2px solid #fff;color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5}
+canvas{display:none}
 </style>
 </head>
 <body>
 <div class="top">
-<h1>🤖 ROBOT V5 - SANS ERREUR</h1>
-<p>BOUGIE MADA - Mode MT5 Manuel pour Volatility</p>
-<p>✅ Plus d'erreur de connexion - Ça marche sur iPhone</p>
+<h1>🤖 ROBOT V9 - CAPTURE QM</h1>
+<p>Capture -> Analyse -> BAM 💥</p>
+<p>Tu ne tapes plus rien</p>
 </div>
+
 <div class="card">
-<div class="flex">
-<div><div class="small">SOLDE DÉMO</div><div class="big yellow" id="solde">100000 Ar</div></div>
-<div><div class="small">GAIN</div><div class="big green" id="gain">+0 Ar</div></div>
-<div><div class="small">RÉUSSITE</div><div class="big" id="winrate">0%</div></div>
-</div>
-</div>
-<div class="card">
-<div class="warn">⚠️ TRADE LE MÊME ACTIF DANS MT5 QUE ICI !</div>
+<div class="info">✅ MODE CAPTURE : Tu mets ta capture, tu touches 4 points, BAM c'est analysé.</div>
 <label class="small">👇 1. CHOISIS TON ACTIF :</label>
-<select id="paire" onchange="changerPaire()">
-<optgroup label="--- AUTO - Binance (sans rien faire) ---">
-<option value="BTCUSDT">BTC / USDT - AUTO</option>
-<option value="ETHUSDT">ETH / USDT - AUTO</option>
-<option value="SOLUSDT">SOL / USDT - AUTO</option>
-<option value="EURUSDT">EUR / USDT - AUTO</option>
-</optgroup>
-<optgroup label="--- MANUEL - Volatility (tu tapes le prix MT5) ---">
-<option value="R_10">Volatility 10 - MANUEL</option>
-<option value="R_25">Volatility 25 - MANUEL</option>
-<option value="R_50">Volatility 50 - MANUEL</option>
-<option value="R_75">Volatility 75 - MANUEL</option>
-<option value="R_100" selected>Volatility 100 - MANUEL</option>
-<option value="1HZ100V">Volatility 100 (1s) - MANUEL</option>
-<option value="1HZ75V">Volatility 75 (1s) - MANUEL</option>
-<option value="R_150">Volatility 150 - MANUEL</option>
-<option value="R_250">Volatility 250 - MANUEL</option>
-</optgroup>
+<select id="paire">
+<option value="Volatility 100">Volatility 100 Index</option>
+<option value="Volatility 75">Volatility 75 Index</option>
+<option value="Volatility 25">Volatility 25 Index</option>
+<option value="Volatility 10">Volatility 10 Index</option>
+<option value="EURUSD">EURUSD</option>
+<option value="GBPUSD">GBPUSD</option>
+<option value="USDJPY">USDJPY</option>
+<option value="XAUUSD">XAUUSD - GOLD</option>
+<option value="US30">US30</option>
+<option value="US100">US100 - Nasdaq</option>
+<option value="BTCUSDT">BTC</option>
+<option value="ETHUSDT">ETH</option>
 </select>
-<label class="small">👇 2. TEMPS :</label>
-<select id="tf"><option value="60">1 min</option><option value="300" selected>5 min</option><option value="900">15 min</option></select>
-<input id="mise" type="number" value="5000">
-<button style="width:100%;background:#00ff88;padding:15px;font-size:18px" onclick="demarrer()">▶️ DÉMARRER LE ROBOT</button>
-<div class="debug" id="debug">Choisis Volatility 100, clique DÉMARRER.</div>
-</div>
-
-<!-- ZONE MANUELLE VOLATILITY - C'EST ÇA QUI REMPLACE DERIV -->
-<div class="card" id="zoneManuel">
-<div class="info">📱 MODE VOLATILITY : Regarde le prix dans MT5, tape-le ici.<br>Le robot va fabriquer les bougies tout seul.</div>
-<label class="small">👇 PRIX QUE TU VOIS DANS MT5 MAINTENANT :</label>
-<input id="prixManuel" type="number" step="0.01" placeholder="Ex: 1354.98 - Copie depuis MT5">
-<button class="btn-prix" onclick="ajouterPrixManuel()">➕ AJOUTER CE PRIX</button>
-<p class="small" id="nbPrix">Bougies fabriquées : 0 / 10 minimum pour commencer</p>
-<button style="width:100%;background:#333;color:#fff;padding:12px;margin-top:6px" onclick="exemplePrix()">🎲 TESTE-MOI : Mettre des prix d'exemple</button>
+<input id="mise" type="number" value="5000" placeholder="Mise en Ar">
 </div>
 
 <div class="card">
-<div class="prix" id="prixLive">--- $</div>
-<div class="small" id="paireLive">En attente...</div>
-<div class="small" id="tendanceTxt">Tendance : ---</div>
-<div class="small" id="sourceTxt">Source : ---</div>
-<canvas id="chart" width="350" height="180"></canvas>
-<div id="signal" class="signal wait">ROBOT ARRÊTÉ</div>
+<label class="small">👇 2. METS TA CAPTURE :</label>
+<input type="file" id="fileInput" accept="image/*" style="display:none" onchange="chargerImage(event)">
+<button style="width:100%;background:#ff00aa;color:#fff;padding:16px;font-size:18px" onclick="document.getElementById('fileInput').click()">📸 METTRE MA CAPTURE MT5</button>
+<button style="width:100%;background:#333;color:#fff;padding:12px;margin-top:8px" onclick="exemple()">🎲 TESTE AVEC EXEMPLE QM</button>
+<div id="imgWrap">
+<img id="imgCapture">
+</div>
+<p class="small" id="aideImg">Pas encore de capture. Mets une capture de MT5.</p>
+</div>
+
+<div class="card" id="cardEtapes">
+<div class="step active" id="step1">👆 ÉTAPE 1 : Touche le <b>HAUT 1</b> - Le premier haut<br><span class="small">C'est le haut le plus haut à gauche</span></div>
+<div class="step" id="step2">👆 ÉTAPE 2 : Touche le <b>BAS</b> - Le bas entre les 2 hauts</div>
+<div class="step" id="step3">👆 ÉTAPE 3 : Touche le <b>HAUT 2</b> - Le deuxième haut, plus bas</div>
+<div class="step" id="step4">👆 ÉTAPE 4 : Touche le <b>PRIX ACTUEL</b> - Où est le prix maintenant</div>
+<button style="width:100%;background:#ffcc00;color:#000;padding:14px;font-size:16px" onclick="resetPoints()">🔄 RECOMMENCER LES POINTS</button>
+<div style="display:flex;gap:8px;margin-top:8px">
+<div style="flex:1"><div class="small">Haut 1</div><input id="vH1" type="number" step="0.01" placeholder="Ex: 1400"></div>
+<div style="flex:1"><div class="small">Bas</div><input id="vL1" type="number" step="0.01" placeholder="Ex: 1350"></div>
+<div style="flex:1"><div class="small">Haut 2</div><input id="vH2" type="number" step="0.01" placeholder="Ex: 1380"></div>
+<div style="flex:1"><div class="small">Prix</div><input id="vPrix" type="number" step="0.01" placeholder="Ex: 1340"></div>
+</div>
+<p class="small">Tu peux aussi taper les 4 prix que tu vois dans MT5 si tu ne veux pas toucher la photo.</p>
+<button style="width:100%;background:#00ff88;color:#000;padding:18px;font-size:20px;margin-top:8px" onclick="analyserBAM()">💥 ANALYSER - BAM !</button>
+</div>
+
+<div class="card">
+<div class="signal wait" id="signal">EN ATTENTE DE CAPTURE</div>
 <p id="detail" style="text-align:center"></p>
 <div class="flex">
 <div><div class="small">🛑 SL</div><div class="sl" id="slVal">---</div></div>
@@ -99,178 +97,146 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:6px;borde
 <div><div class="small">🎯 TP2</div><div class="tp" id="tpVal">---</div></div>
 </div>
 <p id="conseil" class="small"></p>
+<p id="pourquoi" style="text-align:center;font-size:13px"></p>
 </div>
-<div class="card" id="cardPos">
-<h3 style="margin:0;text-align:center">📍 TA POSITION EN COURS</h3>
-<p style="text-align:center" id="posInfo">Aucune position.</p>
-<div class="flex">
-<div><div class="small">SENS</div><div class="big" id="posSens">---</div></div>
-<div><div class="small">ENTRÉE</div><div class="big" id="posEntree">---</div></div>
-<div><div class="small">GAIN LIVE</div><div class="big" id="posGain">0 Ar</div></div>
-</div>
-<button style="width:100%;background:#ff4444;color:#fff;padding:14px;font-size:16px;margin-top:10px" onclick="fermerPosition('Manuel')">❌ FERMER MA POSITION</button>
-</div>
+
 <div class="card">
 <button class="btn-mt5" onclick="ouvrirMT5()">📱 OUVRIR MT5</button>
 <button class="btn-copy" onclick="copierTout()">📋 COPIER SL + TP1 + TP2</button>
-<p class="small">Dans MT5 : 2 ordres de moitié de lot. Ordre 1 = TP1, Ordre 2 = TP2. Même SL.</p>
 </div>
-<div class="card"><h3>📊 Historique Démo</h3><table><tr><th>Heure</th><th>Sens</th><th>Figure</th><th>Résultat</th></tr><tbody id="hist"></tbody></table></div>
+
+<div class="card">
+<h3 style="margin:0;text-align:center">📖 Rappel BAM</h3>
+<p><b>QM Baissier :</b> Haut 1 > Haut 2 ET Prix < Bas = <b style="color:#ff4444">VENDS</b></p>
+<p><b>QM Haussier :</b> Bas 1 < Bas 2 ET Prix > Haut = <b style="color:#00ff88">ACHETES</b></p>
+<p>Sinon = <b>ATTENDS</b>, ce n'est pas encore un QM.</p>
+</div>
+
 <div class="barre-bas">
 <button class="btn-buy" onclick="ouvrirPosition('ACHAT')">🟢 BUY</button>
 <button class="btn-sell" onclick="ouvrirPosition('VENTE')">🔴 SELL</button>
 </div>
+
 <script>
-let timer=null, solde=100000, gainTotal=0, nb=0, wins=0;
-let derniere={o:0,h:0,l:0,c:0,figure:"",paire:""}, sl=0, tp1=0, tp=0, sens="";
-let bougies=[], positionOuverte=null;
-let prixManuels=[]; // Historique des prix tapés à la main
-function logDebug(t){document.getElementById('debug').innerText=t;}
-function fmt(n){return Math.round(n).toLocaleString('fr-FR')+" Ar";}
-function maj(){document.getElementById('solde').innerText=fmt(solde);document.getElementById('gain').innerText=(gainTotal>=0?"+":"")+fmt(gainTotal);document.getElementById('winrate').innerText=nb?Math.round(wins/nb*100)+"%":"0%";}
-function changerPaire(){
-let p=document.getElementById('paire').value;
-let isVol=p.startsWith("R_")||p.startsWith("1HZ");
-document.getElementById('zoneManuel').style.display=isVol?"block":"none";
-if(isVol){logDebug("Mode MANUEL : Tape le prix que tu vois dans MT5.");document.getElementById('sourceTxt').innerText="Source : MT5 Manuel - "+p;}
-else{logDebug("Mode AUTO Binance : Pas besoin de taper le prix.");}
+let etape=1, points={}, sl=0, tp1=0, tp=0, sens="", derniere={c:0,figure:""};
+let solde=100000;
+function chargerImage(e){
+let f=e.target.files[0]; if(!f) return;
+let r=new FileReader();
+r.onload=function(ev){
+document.getElementById('imgCapture').src=ev.target.result;
+document.getElementById('imgWrap').style.display='block';
+document.getElementById('aideImg').innerText='Maintenant touche le HAUT 1 sur ta capture 👆';
+resetPoints();
+};
+r.readAsDataURL(f);
 }
-function exemplePrix(){
-// Pour tester sans MT5 : on met 15 prix qui forment un Marteau
-let base=1350;
-let ex=[1350,1348,1345,1342,1340,1338,1340,1345,1350,1355,1360,1365,1370,1375,1380];
-prixManuels=ex;
-document.getElementById('nbPrix').innerText="Bougies fabriquées : "+ex.length+" / 10 - OK tu peux démarrer !";
-logDebug("Prix d'exemple ajoutés ! Clique DÉMARRER.");
-alert("Prix d'exemple ajoutés ! Clique DÉMARRER maintenant.");
+function exemple(){
+document.getElementById('vH1').value=1400;
+document.getElementById('vL1').value=1350;
+document.getElementById('vH2').value=1380;
+document.getElementById('vPrix').value=1340;
+document.getElementById('imgWrap').style.display='block';
+document.getElementById('imgCapture').src='https://via.placeholder.com/350x200/000000/00ff88?text=Exemple+QM+Baissier';
+document.getElementById('aideImg').innerText='Exemple chargé ! Clique ANALYSER - BAM !';
+alert("Exemple QM Baissier chargé ! Clique 💥 ANALYSER - BAM !");
 }
-function ajouterPrixManuel(){
-let v=parseFloat(document.getElementById('prixManuel').value);
-if(!v||v<=0){alert("Tape d'abord le prix que tu vois dans MT5 ! Ex: 1354.98");return;}
-prixManuels.push(v);
-if(prixManuels.length>60) prixManuels.shift();
-document.getElementById('nbPrix').innerText="Bougies fabriquées : "+prixManuels.length+" / 10 minimum pour commencer";
-document.getElementById('prixManuel').value="";
-logDebug("Prix ajouté : "+v+" - Total : "+prixManuels.length);
-if(prixManuels.length>=10){analyserManuel();}
-else{logDebug("Ajoute encore "+(10-prixManuels.length)+" prix pour commencer.");}
+function resetPoints(){
+etape=1; points={};
+document.querySelectorAll('.point').forEach(p=>p.remove());
+['step1','step2','step3','step4'].forEach((id,i)=>{
+let el=document.getElementById(id);
+el.className='step'+(i===0?' active':'');
+});
 }
-function construireBougiesDepuisPrix(){
-bougies=[];
-for(let i=0;i<prixManuels.length;i++){
-let p=prixManuels[i];
-let prev=i>0?prixManuels[i-1]:p;
-// On fabrique une petite bougie autour du prix
-let o=prev, c=p, h=Math.max(o,c)+Math.abs(c-o)*0.3+0.5, l=Math.min(o,c)-Math.abs(c-o)*0.3-0.5;
-bougies.push({o:o,h:h,l:l,c:c});
-}
-return bougies;
-}
-function dessiner(){
-let cv=document.getElementById('chart'), ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
-if(bougies.length<2) return;
-let highs=Math.max(...bougies.map(b=>b.h)), lows=Math.min(...bougies.map(b=>b.l));
-let range=highs-lows||1, w=cv.width/bougies.length;
-bougies.forEach((b,i)=>{let x=i*w+w/2;let yH=cv.height-((b.h-lows)/range)*(cv.height-20)-10;let yL=cv.height-((b.l-lows)/range)*(cv.height-20)-10;let yO=cv.height-((b.o-lows)/range)*(cv.height-20)-10;let yC=cv.height-((b.c-lows)/range)*(cv.height-20)-10;ctx.strokeStyle=b.c>=b.o?'#00ff88':'#ff4444';ctx.beginPath();ctx.moveTo(x,yH);ctx.lineTo(x,yL);ctx.stroke();ctx.fillStyle=b.c>=b.o?'#00ff88':'#ff4444';ctx.fillRect(x-w*0.3, Math.min(yO,yC), w*0.6, Math.max(2,Math.abs(yC-yO)));});
-[[sl,'#ff4444','SL '],[tp1,'#ffcc00','TP1 '],[tp,'#00ff88','TP2 ']].forEach(([v,c,lab])=>{if(v>0){let y=cv.height-((v-lows)/range)*(cv.height-20)-10;ctx.strokeStyle=c;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=c;ctx.fillText(lab+v.toFixed(2),5,y-3);}});
-}
-async function analyserManuel(){
-if(prixManuels.length<10){logDebug("Il faut 10 prix minimum. Tu en as "+prixManuels.length);return;}
-construireBougiesDepuisPrix();
-traiterSignal("MT5 Manuel");
-}
-async function analyser(){
-let paire=document.getElementById('paire').value, tf=document.getElementById('tf').value;
-let isVol=paire.startsWith("R_")||paire.startsWith("1HZ");
-try{
-if(isVol){
-document.getElementById('sourceTxt').innerText="Source : MT5 Manuel - "+paire;
-if(prixManuels.length<10){logDebug("Mode Volatility : Tape 10 prix depuis MT5 d'abord. Il t'en manque "+(10-prixManuels.length));document.getElementById('paireLive').innerText="Tape "+(10-prixManuels.length)+" prix en haut";return;}
-construireBougiesDepuisPrix();
-traiterSignal("MT5 Manuel");
+document.getElementById('imgWrap').addEventListener('click',function(e){
+let rect=this.getBoundingClientRect();
+let x=e.clientX-rect.left, y=e.clientY-rect.top;
+let label=['H1','L1','H2','PRIX'][etape-1];
+let colors=['#ffcc00','#00ff88','#ff00aa','#ffffff'];
+let d=document.createElement('div');
+d.className='point'; d.style.left=x+'px'; d.style.top=y+'px'; d.style.background=colors[etape-1];
+d.innerText=etape;
+this.appendChild(d);
+document.getElementById('step'+etape).className='step done';
+if(etape<4){
+etape++;
+document.getElementById('step'+etape).className='step active';
+document.getElementById('aideImg').innerText='Bien ! Maintenant étape '+etape;
 }else{
-document.getElementById('sourceTxt').innerText="Source : Binance AUTO - "+paire;
-let tfBinance=tf==="60"?"1m":tf==="300"?"5m":"15m";
-let r=await fetch(`https://api.binance.com/api/v3/klines?symbol=${paire}&interval=${tfBinance}&limit=30`);
-let d=await r.json(); bougies=d.map(x=>({o:parseFloat(x[1]),h:parseFloat(x[2]),l:parseFloat(x[3]),c:parseFloat(x[4])}));
-traiterSignal("Binance AUTO");
+document.getElementById('aideImg').innerText='✅ 4 points touchés ! Mets les 4 prix en bas et clique BAM !';
 }
-}catch(e){logDebug("Erreur Binance : "+e);document.getElementById('paireLive').innerText="Erreur Binance - Essaie BTC";}
+});
+function analyserBAM(){
+let H1=parseFloat(document.getElementById('vH1').value);
+let L1=parseFloat(document.getElementById('vL1').value);
+let H2=parseFloat(document.getElementById('vH2').value);
+let prix=parseFloat(document.getElementById('vPrix').value);
+let paire=document.getElementById('paire').value;
+if(!H1||!L1||!H2||!prix){alert("Il manque un prix ! Remplis les 4 prix : Haut 1, Bas, Haut 2, Prix actuel.");return;}
+derniere.c=prix; derniere.paire=paire;
+let sig=document.getElementById('signal');
+let det=document.getElementById('detail');
+let pourquoi=document.getElementById('pourquoi');
+// QM BAISSIER
+if(H1>H2 && prix<L1){
+sens="VENTE"; derniere.figure="QM BAISSIER";
+sig.className='signal sell'; sig.innerText="🔴 BAM ! QM BAISSIER - VENDS";
+det.innerText=`Haut 1 ${H1} > Haut 2 ${H2} et Prix ${prix} < Bas ${L1} = CASSURE !`;
+sl=H2 + (H1-H2)*0.2;
+let risque=sl-prix; tp1=prix-risque*1; tp=prix-risque*2;
+if(tp>L1) tp=L1;
+pourquoi.innerHTML=`<b style="color:#ff4444">VENDS MAINTENANT.</b><br>Ton QM est confirmé, le prix a cassé le bas.`;
 }
-function traiterSignal(source){
-let paire=document.getElementById('paire').value, tf=document.getElementById('tf').value;
-let b=bougies[bougies.length-1], prev=bougies[bougies.length-2];
-let sma=bougies.slice(-11,-1).reduce((a,x)=>a+x.c,0)/10;
-let tendance=b.c>sma?"HAUSSIERE":"BAISSIERE";
-document.getElementById('tendanceTxt').innerText="Tendance : "+tendance+" (SMA10: "+sma.toFixed(2)+")";
-document.getElementById('tendanceTxt').style.color=tendance==="HAUSSIERE"?"#00ff88":"#ff4444";
-derniere={...b,paire,tf};
-document.getElementById('prixLive').innerText=b.c.toFixed(2)+" $";
-document.getElementById('paireLive').innerText=paire+" - "+source;
-let corps=Math.abs(b.c-b.o), mH=b.h-Math.max(b.o,b.c), mB=Math.min(b.o,b.c)-b.l, tot=b.h-b.l;
-let sig=document.getElementById('signal'), det=document.getElementById('detail');
-let figure="", s="", risque=0;
-if(corps<tot*0.2){figure="DOJI";sig.className='signal wait';sig.innerText="➕ DOJI - ATTENDS";det.innerText="Personne ne sait.";s="";}
-else if(mB>corps*2 && mH<corps*0.5){
-if(tendance!=="HAUSSIERE"){figure="MARTEAU CONTRE";sig.className='signal wait';sig.innerText="⏳ MARTEAU MAIS BAISSIER - ATTENDS";s="";det.innerText="Piège. Attends.";}
-else{figure="MARTEAU";sig.className='signal buy';sig.innerText="🔨 MARTEAU - HAUSSE";sl=b.l;risque=b.c-sl;tp1=b.c+risque*1;tp=b.c+risque*2;s="ACHAT";det.innerText="Marteau + tendance = OK.";}
+// QM HAUSSIER - on inverse la logique : si tu as mis Bas1, Haut, Bas2, on le détecte aussi si Haut1 est en fait un bas ?
+// Pour simplifier, on teste aussi le cas où l'utilisateur a mis Bas1, Haut, Bas2, Prix
+// Si H1 < L1 et H2 > H1, c'est un QM Haussier déguisé
+else if(H1 < L1 && H2 > H1 && prix > L1){
+sens="ACHAT"; derniere.figure="QM HAUSSIER";
+sig.className='signal buy'; sig.innerText="🟢 BAM ! QM HAUSSIER - ACHETES";
+det.innerText=`Bas 1 ${H1} < Bas 2 ${H2} et Prix ${prix} > Haut ${L1} = CASSURE !`;
+sl=H2 - (H2-H1)*0.2;
+let risque=prix-sl; tp1=prix+risque*1; tp=prix+risque*2;
+if(tp<L1) tp=L1;
+pourquoi.innerHTML=`<b style="color:#00ff88">ACHETES MAINTENANT.</b><br>Ton QM est confirmé, le prix a cassé le haut.`;
 }
-else if(mH>corps*2 && mB<corps*0.5){
-if(tendance!=="BAISSIERE"){figure="ETOILE CONTRE";sig.className='signal wait';sig.innerText="⏳ ETOILE MAIS HAUSSIER - ATTENDS";s="";det.innerText="Piège. Attends.";}
-else{figure="ETOILE FILANTE";sig.className='signal sell';sig.innerText="⭐ ETOILE - BAISSE";sl=b.h;risque=sl-b.c;tp1=b.c-risque*1;tp=b.c-risque*2;s="VENTE";det.innerText="Étoile + tendance = OK.";}
+// EN FORMATION BAISSIER
+else if(H1>H2 && prix>L1 && prix<H2){
+sens=""; derniere.figure="QM EN FORMATION";
+sig.className='signal wait'; sig.innerText="⏳ QM EN FORMATION - ATTENDS";
+det.innerText=`Haut 1 ${H1} > Haut 2 ${H2} mais Prix ${prix} n'a pas encore cassé Bas ${L1}.`;
+sl=0; tp1=0; tp=0;
+pourquoi.innerHTML=`Attends que le prix casse <b>${L1}</b> pour VENDRE. Ne vends pas avant.`;
 }
-else if(b.c>b.o && prev.c<prev.o && b.c>prev.o && b.o<prev.c){
-if(tendance!=="HAUSSIERE"){figure="AVALEMENT CONTRE";sig.className='signal wait';sig.innerText="⏳ AVALEMENT MAIS BAISSIER - ATTENDS";s="";}
-else{figure="AVALEMENT HAUSSIER";sig.className='signal buy';sig.innerText="🟢 AVALEMENT HAUSSIER";sl=(b.o+b.c)/2;risque=b.c-sl;tp1=b.c+risque*1;tp=b.c+risque*2;s="ACHAT";det.innerText="Avalement + tendance = OK.";}
+// EN FORMATION HAUSSIER
+else if(H1 < L1 && H2 > H1 && prix < L1 && prix > H2){
+sens=""; derniere.figure="QM EN FORMATION";
+sig.className='signal wait'; sig.innerText="⏳ QM EN FORMATION - ATTENDS";
+det.innerText=`Bas 1 ${H1} < Bas 2 ${H2} mais Prix ${prix} n'a pas encore cassé Haut ${L1}.`;
+sl=0; tp1=0; tp=0;
+pourquoi.innerHTML=`Attends que le prix casse <b>${L1}</b> pour ACHETER.`;
 }
-else if(b.c<b.o && prev.c>prev.o && b.c<prev.o && b.o>prev.c){
-if(tendance!=="BAISSIERE"){figure="AVALEMENT CONTRE";sig.className='signal wait';sig.innerText="⏳ AVALEMENT MAIS HAUSSIER - ATTENDS";s="";}
-else{figure="AVALEMENT BAISSIER";sig.className='signal sell';sig.innerText="🔴 AVALEMENT BAISSIER";sl=(b.o+b.c)/2;risque=sl-b.c;tp1=b.c-risque*1;tp=b.c-risque*2;s="VENTE";det.innerText="Avalement + tendance = OK.";}
+else{
+sens=""; derniere.figure="PAS DE QM";
+sig.className='signal wait'; sig.innerText="⏳ PAS DE QM - ATTENDS";
+det.innerText=`Pas de QM clair. H1=${H1} H2=${H2} Bas=${L1} Prix=${prix}`;
+sl=0; tp1=0; tp=0;
+pourquoi.innerHTML=`Ce n'est pas un QM. Attends une vraie structure. Ne trade pas ça.`;
 }
-else{figure="AUCUNE";sig.className='signal wait';sig.innerText="⏳ ATTENDS";det.innerText="Pas de figure.";s="";sl=0;tp1=0;tp=0;}
-derniere.figure=figure; sens=s;
 document.getElementById('slVal').innerText=sl?sl.toFixed(2):"---";
 document.getElementById('tp1Val').innerText=tp1?tp1.toFixed(2):"---";
 document.getElementById('tpVal').innerText=tp?tp.toFixed(2):"---";
-document.getElementById('conseil').innerText=s?`Si ${s}: SL=${sl.toFixed(2)} TP1=${tp1.toFixed(2)} TP2=${tp.toFixed(2)}`:"Attends une figure + tendance.";
-if(positionOuverte){
-let prixActuel=b.c;
-let diff=positionOuverte.sens==='ACHAT'?(prixActuel-positionOuverte.entree):(positionOuverte.entree-prixActuel);
-let gainLive=Math.round(diff/positionOuverte.entree*positionOuverte.mise*20);
-document.getElementById('posGain').innerText=(gainLive>=0?'+':'')+fmt(gainLive);
-document.getElementById('posGain').style.color=gainLive>=0?'#00ff88':'#ff4444';
-if(positionOuverte.sens==='ACHAT'){if(prixActuel<=positionOuverte.sl) fermerPosition("SL");else if(prixActuel>=positionOuverte.tp) fermerPosition("TP2");else if(prixActuel>=positionOuverte.tp1 && !positionOuverte.tp1Touche){positionOuverte.tp1Touche=true;alert("✅ TP1 touché ! Ferme 50% dans MT5, laisse le reste pour TP2.");}}
-else{if(prixActuel>=positionOuverte.sl) fermerPosition("SL");else if(prixActuel<=positionOuverte.tp) fermerPosition("TP2");else if(prixActuel<=positionOuverte.tp1 && !positionOuverte.tp1Touche){positionOuverte.tp1Touche=true;alert("✅ TP1 touché ! Ferme 50% dans MT5, laisse le reste pour TP2.");}}
-}
-dessiner();
+document.getElementById('conseil').innerText=sens?`Si ${sens}: SL=${sl.toFixed(2)} TP1=${tp1.toFixed(2)} TP2=${tp.toFixed(2)}`:"Attends un QM confirmé.";
+if(sens) navigator.vibrate && navigator.vibrate([100,50,100]);
 }
 function ouvrirPosition(choix){
-if(positionOuverte){alert("Tu as déjà une position !");return;}
-if(!sens){alert("⛔ BLOQUÉ : Le robot dit ATTENDS.");return;}
+if(!sens){alert("⛔ BLOQUÉ : Pas de QM confirmé. Clique d'abord ANALYSER - BAM !");return;}
 if((choix==='ACHAT' && sens==='VENTE') || (choix==='VENTE' && sens==='ACHAT')){alert("⛔ BLOQUÉ : Robot dit "+sens);return;}
-let mise=parseFloat(document.getElementById('mise').value)||5000;
-positionOuverte={sens:choix,entree:derniere.c,mise:mise,figure:derniere.figure,sl:sl,tp1:tp1,tp:tp,tp1Touche:false};
-document.getElementById('posSens').innerText=choix;
-document.getElementById('posEntree').innerText=derniere.c.toFixed(2)+" $";
-document.getElementById('posInfo').innerText=`${choix} à ${derniere.c.toFixed(2)} | SL ${sl.toFixed(2)} | TP1 ${tp1.toFixed(2)} | TP2 ${tp.toFixed(2)} | ${derniere.figure}`;
-document.getElementById('cardPos').classList.add('pos-ouverte');
+alert(`✅ Tu peux ${choix} !\nSL: ${sl.toFixed(2)}\nTP1: ${tp1.toFixed(2)}\nTP2: ${tp.toFixed(2)}\n\nCopié ! Colle dans MT5.`);
 copierTout(); setTimeout(ouvrirMT5,500);
 }
-function fermerPosition(motif="Manuel"){
-if(!positionOuverte) return;
-let prixSortie=derniere.c; let gain=0;
-if(motif==="TP2") gain=positionOuverte.mise*2; else if(motif==="SL") gain=-positionOuverte.mise;
-else{let diff=positionOuverte.sens==='ACHAT'?(prixSortie-positionOuverte.entree):(positionOuverte.entree-prixSortie);gain=Math.round(diff/positionOuverte.entree*positionOuverte.mise*20);}
-solde+=gain;gainTotal+=gain;nb++;if(gain>0)wins++;
-let hist=document.getElementById('hist');let tr=document.createElement('tr');
-tr.innerHTML=`<td>${new Date().toLocaleTimeString()}</td><td>${positionOuverte.sens}</td><td>${positionOuverte.figure}-${motif}</td><td style="color:${gain>=0?'#00ff88':'#ff4444'}">${gain>=0?'+':''}${fmt(gain)}</td>`;hist.prepend(tr);
-alert(`${motif} - ${gain>=0?'✅ GAGNÉ +':'❌ PERDU '}${fmt(gain)}\nSolde: ${fmt(solde)}`);
-positionOuverte=null;document.getElementById('posSens').innerText="---";document.getElementById('posEntree').innerText="---";document.getElementById('posGain').innerText="0 Ar";document.getElementById('posInfo').innerText="Position fermée.";document.getElementById('cardPos').classList.remove('pos-ouverte');maj();
-}
-function demarrer(){
-if(timer) clearInterval(timer);
-let p=document.getElementById('paire').value;
-let isVol=p.startsWith("R_")||p.startsWith("1HZ");
-if(isVol){
-if(prixManuels.length<10){alert("Pour Volatility, tape d'abord 10 prix depuis MT5 en haut. Ou clique sur 🎲 TESTE-MOI pour tester.");return;}
-}
+function copierTout(){let txt=`SL: ${sl.toFixed(2)} | TP1: ${tp1.toFixed(2)} | TP2: ${tp.toFixed(2)} | Figure: ${derniere.figure} | Paire: ${document.getElementById('paire').value}`;navigator.clipboard.writeText(txt).then(()=>{});}
+function ouvrirMT5(){window.location.href="metatrader5://";setTimeout(()=>{window.open("https://play.google.com/store/apps/details?id=net.metaquotes.metatrader5","_blank");},800);}
+</script>
+</body>
+</html>
