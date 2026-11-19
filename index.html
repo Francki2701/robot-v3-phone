@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>ROBOT V4.2 FINAL - BOUGIE MADA</title>
+<title>ROBOT V5 - SANS ERREUR CONNEXION</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#0a0a1a;color:#fff;font-family:Arial;padding:8px;padding-bottom:120px}
@@ -28,14 +28,16 @@ canvas{width:100%;background:#000;border-radius:12px}
 table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:6px;border-bottom:1px solid #333;text-align:center}
 .pos-ouverte{border:2px solid #ffcc00;background:#2a2a00 !important}
 .warn{background:#ff4444;color:#fff;padding:10px;border-radius:12px;text-align:center;font-weight:900;font-size:13px;margin:10px 0}
+.info{background:#007bff;color:#fff;padding:10px;border-radius:12px;text-align:center;font-size:13px;margin:10px 0}
 .debug{background:#000;color:#ffcc00;padding:8px;border-radius:8px;font-size:11px;text-align:center;margin-top:6px;word-break:break-word}
+.btn-prix{width:100%;background:#ffcc00;color:#000;padding:16px;font-size:18px;margin-top:6px}
 </style>
 </head>
 <body>
 <div class="top">
-<h1>🤖 ROBOT V4.2 FINAL</h1>
-<p>BOUGIE MADA - Binance + Deriv - SANS PC</p>
-<p>⚠️ DÉMO D'ABORD - 20 trades de test avant réel</p>
+<h1>🤖 ROBOT V5 - SANS ERREUR</h1>
+<p>BOUGIE MADA - Mode MT5 Manuel pour Volatility</p>
+<p>✅ Plus d'erreur de connexion - Ça marche sur iPhone</p>
 </div>
 <div class="card">
 <div class="flex">
@@ -46,34 +48,43 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:6px;borde
 </div>
 <div class="card">
 <div class="warn">⚠️ TRADE LE MÊME ACTIF DANS MT5 QUE ICI !</div>
-<label class="small">👇 CHOISIS TON ACTIF ICI :</label>
-<select id="paire">
-<optgroup label="--- CRYPTO - Binance ---">
-<option value="BTCUSDT">BTC / USDT</option>
-<option value="ETHUSDT">ETH / USDT</option>
-<option value="SOLUSDT">SOL / USDT</option>
+<label class="small">👇 1. CHOISIS TON ACTIF :</label>
+<select id="paire" onchange="changerPaire()">
+<optgroup label="--- AUTO - Binance (sans rien faire) ---">
+<option value="BTCUSDT">BTC / USDT - AUTO</option>
+<option value="ETHUSDT">ETH / USDT - AUTO</option>
+<option value="SOLUSDT">SOL / USDT - AUTO</option>
+<option value="EURUSDT">EUR / USDT - AUTO</option>
 </optgroup>
-<optgroup label="--- VOLATILITY - Deriv / MT5 ---">
-<option value="R_10">Volatility 10 Index</option>
-<option value="R_25">Volatility 25 Index</option>
-<option value="R_50">Volatility 50 Index</option>
-<option value="R_75">Volatility 75 Index</option>
-<option value="R_100" selected>Volatility 100 Index</option>
-<option value="1HZ100V">Volatility 100 (1s) Index</option>
-<option value="1HZ75V">Volatility 75 (1s) Index</option>
-<option value="R_150">Volatility 150 Index</option>
-<option value="R_250">Volatility 250 Index</option>
-</optgroup>
-<optgroup label="--- FOREX ---">
-<option value="EURUSDT">EUR / USDT - Comme EURUSD MT5</option>
+<optgroup label="--- MANUEL - Volatility (tu tapes le prix MT5) ---">
+<option value="R_10">Volatility 10 - MANUEL</option>
+<option value="R_25">Volatility 25 - MANUEL</option>
+<option value="R_50">Volatility 50 - MANUEL</option>
+<option value="R_75">Volatility 75 - MANUEL</option>
+<option value="R_100" selected>Volatility 100 - MANUEL</option>
+<option value="1HZ100V">Volatility 100 (1s) - MANUEL</option>
+<option value="1HZ75V">Volatility 75 (1s) - MANUEL</option>
+<option value="R_150">Volatility 150 - MANUEL</option>
+<option value="R_250">Volatility 250 - MANUEL</option>
 </optgroup>
 </select>
-<label class="small">👇 CHOISIS LE TEMPS :</label>
+<label class="small">👇 2. TEMPS :</label>
 <select id="tf"><option value="60">1 min</option><option value="300" selected>5 min</option><option value="900">15 min</option></select>
 <input id="mise" type="number" value="5000">
 <button style="width:100%;background:#00ff88;padding:15px;font-size:18px" onclick="demarrer()">▶️ DÉMARRER LE ROBOT</button>
-<div class="debug" id="debug">Prêt. Choisis Volatility 100 et clique DÉMARRER.</div>
+<div class="debug" id="debug">Choisis Volatility 100, clique DÉMARRER.</div>
 </div>
+
+<!-- ZONE MANUELLE VOLATILITY - C'EST ÇA QUI REMPLACE DERIV -->
+<div class="card" id="zoneManuel">
+<div class="info">📱 MODE VOLATILITY : Regarde le prix dans MT5, tape-le ici.<br>Le robot va fabriquer les bougies tout seul.</div>
+<label class="small">👇 PRIX QUE TU VOIS DANS MT5 MAINTENANT :</label>
+<input id="prixManuel" type="number" step="0.01" placeholder="Ex: 1354.98 - Copie depuis MT5">
+<button class="btn-prix" onclick="ajouterPrixManuel()">➕ AJOUTER CE PRIX</button>
+<p class="small" id="nbPrix">Bougies fabriquées : 0 / 10 minimum pour commencer</p>
+<button style="width:100%;background:#333;color:#fff;padding:12px;margin-top:6px" onclick="exemplePrix()">🎲 TESTE-MOI : Mettre des prix d'exemple</button>
+</div>
+
 <div class="card">
 <div class="prix" id="prixLive">--- $</div>
 <div class="small" id="paireLive">En attente...</div>
@@ -113,9 +124,48 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:6px;borde
 let timer=null, solde=100000, gainTotal=0, nb=0, wins=0;
 let derniere={o:0,h:0,l:0,c:0,figure:"",paire:""}, sl=0, tp1=0, tp=0, sens="";
 let bougies=[], positionOuverte=null;
+let prixManuels=[]; // Historique des prix tapés à la main
 function logDebug(t){document.getElementById('debug').innerText=t;}
 function fmt(n){return Math.round(n).toLocaleString('fr-FR')+" Ar";}
 function maj(){document.getElementById('solde').innerText=fmt(solde);document.getElementById('gain').innerText=(gainTotal>=0?"+":"")+fmt(gainTotal);document.getElementById('winrate').innerText=nb?Math.round(wins/nb*100)+"%":"0%";}
+function changerPaire(){
+let p=document.getElementById('paire').value;
+let isVol=p.startsWith("R_")||p.startsWith("1HZ");
+document.getElementById('zoneManuel').style.display=isVol?"block":"none";
+if(isVol){logDebug("Mode MANUEL : Tape le prix que tu vois dans MT5.");document.getElementById('sourceTxt').innerText="Source : MT5 Manuel - "+p;}
+else{logDebug("Mode AUTO Binance : Pas besoin de taper le prix.");}
+}
+function exemplePrix(){
+// Pour tester sans MT5 : on met 15 prix qui forment un Marteau
+let base=1350;
+let ex=[1350,1348,1345,1342,1340,1338,1340,1345,1350,1355,1360,1365,1370,1375,1380];
+prixManuels=ex;
+document.getElementById('nbPrix').innerText="Bougies fabriquées : "+ex.length+" / 10 - OK tu peux démarrer !";
+logDebug("Prix d'exemple ajoutés ! Clique DÉMARRER.");
+alert("Prix d'exemple ajoutés ! Clique DÉMARRER maintenant.");
+}
+function ajouterPrixManuel(){
+let v=parseFloat(document.getElementById('prixManuel').value);
+if(!v||v<=0){alert("Tape d'abord le prix que tu vois dans MT5 ! Ex: 1354.98");return;}
+prixManuels.push(v);
+if(prixManuels.length>60) prixManuels.shift();
+document.getElementById('nbPrix').innerText="Bougies fabriquées : "+prixManuels.length+" / 10 minimum pour commencer";
+document.getElementById('prixManuel').value="";
+logDebug("Prix ajouté : "+v+" - Total : "+prixManuels.length);
+if(prixManuels.length>=10){analyserManuel();}
+else{logDebug("Ajoute encore "+(10-prixManuels.length)+" prix pour commencer.");}
+}
+function construireBougiesDepuisPrix(){
+bougies=[];
+for(let i=0;i<prixManuels.length;i++){
+let p=prixManuels[i];
+let prev=i>0?prixManuels[i-1]:p;
+// On fabrique une petite bougie autour du prix
+let o=prev, c=p, h=Math.max(o,c)+Math.abs(c-o)*0.3+0.5, l=Math.min(o,c)-Math.abs(c-o)*0.3-0.5;
+bougies.push({o:o,h:h,l:l,c:c});
+}
+return bougies;
+}
 function dessiner(){
 let cv=document.getElementById('chart'), ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
 if(bougies.length<2) return;
@@ -124,63 +174,39 @@ let range=highs-lows||1, w=cv.width/bougies.length;
 bougies.forEach((b,i)=>{let x=i*w+w/2;let yH=cv.height-((b.h-lows)/range)*(cv.height-20)-10;let yL=cv.height-((b.l-lows)/range)*(cv.height-20)-10;let yO=cv.height-((b.o-lows)/range)*(cv.height-20)-10;let yC=cv.height-((b.c-lows)/range)*(cv.height-20)-10;ctx.strokeStyle=b.c>=b.o?'#00ff88':'#ff4444';ctx.beginPath();ctx.moveTo(x,yH);ctx.lineTo(x,yL);ctx.stroke();ctx.fillStyle=b.c>=b.o?'#00ff88':'#ff4444';ctx.fillRect(x-w*0.3, Math.min(yO,yC), w*0.6, Math.max(2,Math.abs(yC-yO)));});
 [[sl,'#ff4444','SL '],[tp1,'#ffcc00','TP1 '],[tp,'#00ff88','TP2 ']].forEach(([v,c,lab])=>{if(v>0){let y=cv.height-((v-lows)/range)*(cv.height-20)-10;ctx.strokeStyle=c;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=c;ctx.fillText(lab+v.toFixed(2),5,y-3);}});
 }
-// V4.2 : ON NE DEMANDE PLUS LES BOUGIES A DERIV, ON DEMANDE LES TICKS ET ON FABRIQUE LES BOUGIES NOUS-MEME
-function getDerivCandlesViaTicks(symbol, granularitySec){
-return new Promise((resolve,reject)=>{
-let ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
-let done=false;
-let timeout=setTimeout(()=>{if(!done){try{ws.close()}catch(e){} reject("Timeout 10s - Deriv ne répond pas, vérifie ta 4G");}},10000);
-ws.onopen=()=>{
-logDebug("Connecté à Deriv... demande des ticks pour "+symbol);
-ws.send(JSON.stringify({ticks_history:symbol, end:"latest", count:1000, style:"ticks"}));
-};
-ws.onmessage=(msg)=>{
-let data=JSON.parse(msg.data);
-if(data.error){clearTimeout(timeout);done=true;ws.close();reject("Deriv dit : "+data.error.message);}
-if(data.msg_type==="history"){
-clearTimeout(timeout);done=true;ws.close();
-let ticks=data.history.times.map((t,i)=>({time:t*1000, price:parseFloat(data.history.prices[i])}));
-if(ticks.length<10){reject("Pas assez de ticks pour "+symbol);return;}
-// Fabriquer les bougies à partir des ticks
-let candles=[]; let g=granularitySec*1000;
-let start=Math.floor(ticks[0].time/g)*g;
-let map={};
-ticks.forEach(tk=>{
-let bucket=Math.floor(tk.time/g)*g;
-if(!map[bucket]) map[bucket]={o:tk.price,h:tk.price,l:tk.price,c:tk.price};
-else{map[bucket].h=Math.max(map[bucket].h,tk.price);map[bucket].l=Math.min(map[bucket].l,tk.price);map[bucket].c=tk.price;}
-});
-let keys=Object.keys(map).sort((a,b)=>a-b);
-keys.forEach(k=>candles.push(map[k]));
-logDebug("OK Deriv : "+ticks.length+" ticks reçus, "+candles.length+" bougies fabriquées");
-resolve(candles.slice(-30));
-}
-};
-ws.onerror=()=>{clearTimeout(timeout);if(!done){done=true;reject("WebSocket bloqué par le navigateur / réseau. Essaie Chrome, pas WhatsApp.");}};
-});
+async function analyserManuel(){
+if(prixManuels.length<10){logDebug("Il faut 10 prix minimum. Tu en as "+prixManuels.length);return;}
+construireBougiesDepuisPrix();
+traiterSignal("MT5 Manuel");
 }
 async function analyser(){
 let paire=document.getElementById('paire').value, tf=document.getElementById('tf').value;
 let isVol=paire.startsWith("R_")||paire.startsWith("1HZ");
 try{
 if(isVol){
-document.getElementById('sourceTxt').innerText="Source : Deriv (Ticks) - "+paire;
-logDebug("Chargement "+paire+"...");
-let candles=await getDerivCandlesViaTicks(paire,parseInt(tf)); bougies=candles;
+document.getElementById('sourceTxt').innerText="Source : MT5 Manuel - "+paire;
+if(prixManuels.length<10){logDebug("Mode Volatility : Tape 10 prix depuis MT5 d'abord. Il t'en manque "+(10-prixManuels.length));document.getElementById('paireLive').innerText="Tape "+(10-prixManuels.length)+" prix en haut";return;}
+construireBougiesDepuisPrix();
+traiterSignal("MT5 Manuel");
 }else{
-document.getElementById('sourceTxt').innerText="Source : Binance - "+paire;
+document.getElementById('sourceTxt').innerText="Source : Binance AUTO - "+paire;
 let tfBinance=tf==="60"?"1m":tf==="300"?"5m":"15m";
 let r=await fetch(`https://api.binance.com/api/v3/klines?symbol=${paire}&interval=${tfBinance}&limit=30`);
 let d=await r.json(); bougies=d.map(x=>({o:parseFloat(x[1]),h:parseFloat(x[2]),l:parseFloat(x[3]),c:parseFloat(x[4])}));
+traiterSignal("Binance AUTO");
 }
-let b=bougies[bougies.length-2], prev=bougies[bougies.length-3];
+}catch(e){logDebug("Erreur Binance : "+e);document.getElementById('paireLive').innerText="Erreur Binance - Essaie BTC";}
+}
+function traiterSignal(source){
+let paire=document.getElementById('paire').value, tf=document.getElementById('tf').value;
+let b=bougies[bougies.length-1], prev=bougies[bougies.length-2];
 let sma=bougies.slice(-11,-1).reduce((a,x)=>a+x.c,0)/10;
 let tendance=b.c>sma?"HAUSSIERE":"BAISSIERE";
 document.getElementById('tendanceTxt').innerText="Tendance : "+tendance+" (SMA10: "+sma.toFixed(2)+")";
 document.getElementById('tendanceTxt').style.color=tendance==="HAUSSIERE"?"#00ff88":"#ff4444";
 derniere={...b,paire,tf};
 document.getElementById('prixLive').innerText=b.c.toFixed(2)+" $";
-document.getElementById('paireLive').innerText=paire+" - "+tf+"s";
+document.getElementById('paireLive').innerText=paire+" - "+source;
 let corps=Math.abs(b.c-b.o), mH=b.h-Math.max(b.o,b.c), mB=Math.min(b.o,b.c)-b.l, tot=b.h-b.l;
 let sig=document.getElementById('signal'), det=document.getElementById('detail');
 let figure="", s="", risque=0;
@@ -217,7 +243,6 @@ if(positionOuverte.sens==='ACHAT'){if(prixActuel<=positionOuverte.sl) fermerPosi
 else{if(prixActuel>=positionOuverte.sl) fermerPosition("SL");else if(prixActuel<=positionOuverte.tp) fermerPosition("TP2");else if(prixActuel<=positionOuverte.tp1 && !positionOuverte.tp1Touche){positionOuverte.tp1Touche=true;alert("✅ TP1 touché ! Ferme 50% dans MT5, laisse le reste pour TP2.");}}
 }
 dessiner();
-}catch(e){console.log(e);logDebug("ERREUR : "+e);document.getElementById('paireLive').innerText="Erreur - Regarde le message jaune en haut";}
 }
 function ouvrirPosition(choix){
 if(positionOuverte){alert("Tu as déjà une position !");return;}
@@ -242,10 +267,10 @@ tr.innerHTML=`<td>${new Date().toLocaleTimeString()}</td><td>${positionOuverte.s
 alert(`${motif} - ${gain>=0?'✅ GAGNÉ +':'❌ PERDU '}${fmt(gain)}\nSolde: ${fmt(solde)}`);
 positionOuverte=null;document.getElementById('posSens').innerText="---";document.getElementById('posEntree').innerText="---";document.getElementById('posGain').innerText="0 Ar";document.getElementById('posInfo').innerText="Position fermée.";document.getElementById('cardPos').classList.remove('pos-ouverte');maj();
 }
-function demarrer(){if(timer) clearInterval(timer); analyser(); timer=setInterval(analyser,15000); alert("Robot V4.2 démarré !");}
-function copierTout(){let txt=`SL: ${sl.toFixed(2)} | TP1: ${tp1.toFixed(2)} | TP2: ${tp.toFixed(2)} | Figure: ${derniere.figure} | Prix: ${derniere.c}`;navigator.clipboard.writeText(txt).then(()=>{});}
-function ouvrirMT5(){window.location.href="metatrader5://";setTimeout(()=>{window.open("https://play.google.com/store/apps/details?id=net.metaquotes.metatrader5","_blank");},800);}
-maj();
-</script>
-</body>
-</html>
+function demarrer(){
+if(timer) clearInterval(timer);
+let p=document.getElementById('paire').value;
+let isVol=p.startsWith("R_")||p.startsWith("1HZ");
+if(isVol){
+if(prixManuels.length<10){alert("Pour Volatility, tape d'abord 10 prix depuis MT5 en haut. Ou clique sur 🎲 TESTE-MOI pour tester.");return;}
+}
