@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>ROBOT V4 - TOUTES VOLATILITY</title>
+<title>ROBOT V4.1 FINAL - BOUGIE MADA</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#0a0a1a;color:#fff;font-family:Arial;padding:8px;padding-bottom:120px}
@@ -32,7 +32,7 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:6px;borde
 </head>
 <body>
 <div class="top">
-<h1>🤖 ROBOT V4 - VOLATILITY</h1>
+<h1>🤖 ROBOT V4.1 FINAL</h1>
 <p>BOUGIE MADA - Binance + Deriv - SANS PC</p>
 <p>⚠️ DÉMO D'ABORD - 20 trades de test avant réel</p>
 </div>
@@ -58,11 +58,11 @@ table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:6px;borde
 <option value="R_75">Volatility 75 Index</option>
 <option value="R_100" selected>Volatility 100 Index</option>
 <option value="1HZ100V">Volatility 100 (1s) Index</option>
+<option value="1HZ75V">Volatility 75 (1s) Index</option>
 <option value="R_150">Volatility 150 Index</option>
 <option value="R_250">Volatility 250 Index</option>
-<option value="R_75_1s">Volatility 75 (1s) - Bientôt</option>
 </optgroup>
-<optgroup label="--- FOREX - Binance ---">
+<optgroup label="--- FOREX ---">
 <option value="EURUSDT">EUR / USDT - Comme EURUSD MT5</option>
 </optgroup>
 </select>
@@ -119,35 +119,39 @@ let range=highs-lows||1, w=cv.width/bougies.length;
 bougies.forEach((b,i)=>{let x=i*w+w/2;let yH=cv.height-((b.h-lows)/range)*(cv.height-20)-10;let yL=cv.height-((b.l-lows)/range)*(cv.height-20)-10;let yO=cv.height-((b.o-lows)/range)*(cv.height-20)-10;let yC=cv.height-((b.c-lows)/range)*(cv.height-20)-10;ctx.strokeStyle=b.c>=b.o?'#00ff88':'#ff4444';ctx.beginPath();ctx.moveTo(x,yH);ctx.lineTo(x,yL);ctx.stroke();ctx.fillStyle=b.c>=b.o?'#00ff88':'#ff4444';ctx.fillRect(x-w*0.3, Math.min(yO,yC), w*0.6, Math.max(2,Math.abs(yC-yO)));});
 [[sl,'#ff4444','SL '],[tp1,'#ffcc00','TP1 '],[tp,'#00ff88','TP2 ']].forEach(([v,c,lab])=>{if(v>0){let y=cv.height-((v-lows)/range)*(cv.height-20)-10;ctx.strokeStyle=c;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=c;ctx.fillText(lab+v.toFixed(2),5,y-3);}});
 }
-// NOUVEAU : Récupérer les bougies Deriv pour Volatility
 function getDerivCandles(symbol, granularity){
+if(symbol==="1HZ100V" && granularity<60) granularity=60;
+if(symbol==="1HZ75V" && granularity<60) granularity=60;
 return new Promise((resolve,reject)=>{
-let ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
-ws.onopen=()=>{ws.send(JSON.stringify({ticks_history:symbol, end:"latest", count:30, style:"candles", granularity:parseInt(granularity)}));};
-ws.onmessage=(msg)=>{let data=JSON.parse(msg.data);if(data.msg_type==="candles"){ws.close();let arr=data.candles.map(c=>({o:parseFloat(c.open),h:parseFloat(c.high),l:parseFloat(c.low),c:parseFloat(c.close)}));resolve(arr);}if(data.error){ws.close();reject(data.error);}};
-ws.onerror=()=>reject("Erreur Deriv");setTimeout(()=>{try{ws.close()}catch(e){}reject("Timeout Deriv")},8000);
+let urls=['wss://ws.binaryws.com/websockets/v3?app_id=1089','wss://ws.derivws.com/websockets/v3?app_id=1089'];
+let idx=0;
+function essayer(){
+if(idx>=urls.length){reject("Tous serveurs bloqués");return;}
+let ws=new WebSocket(urls[idx]);
+let timeout=setTimeout(()=>{try{ws.close()}catch(e){} idx++; essayer();},6000);
+ws.onopen=()=>{ws.send(JSON.stringify({ticks_history:symbol,end:"latest",count:30,style:"candles",granularity:parseInt(granularity)}));};
+ws.onmessage=(msg)=>{let data=JSON.parse(msg.data);if(data.msg_type==="candles"){clearTimeout(timeout);ws.close();let arr=data.candles.map(c=>({o:parseFloat(c.open),h:parseFloat(c.high),l:parseFloat(c.low),c:parseFloat(c.close)}));resolve(arr);}if(data.error){clearTimeout(timeout);ws.close();idx++;essayer();}};
+ws.onerror=()=>{clearTimeout(timeout);idx++;essayer();};
+}
+essayer();
 });
 }
 async function analyser(){
 let paire=document.getElementById('paire').value, tf=document.getElementById('tf').value;
-let isVol = paire.startsWith("R_") || paire.startsWith("1HZ");
+let isVol=paire.startsWith("R_")||paire.startsWith("1HZ");
 try{
 if(isVol){
-// --- SOURCE DERIV ---
 document.getElementById('sourceTxt').innerText="Source : Deriv - "+paire;
-let tfBinance = tf==="60"?"1m":tf==="300"?"5m":"15m";
-let candles = await getDerivCandles(paire, tf);
-bougies=candles;
+let candles=await getDerivCandles(paire,tf); bougies=candles;
 }else{
-// --- SOURCE BINANCE ---
 document.getElementById('sourceTxt').innerText="Source : Binance - "+paire;
-let tfBinance = tf==="60"?"1m":tf==="300"?"5m":"15m";
+let tfBinance=tf==="60"?"1m":tf==="300"?"5m":"15m";
 let r=await fetch(`https://api.binance.com/api/v3/klines?symbol=${paire}&interval=${tfBinance}&limit=30`);
 let d=await r.json(); bougies=d.map(x=>({o:parseFloat(x[1]),h:parseFloat(x[2]),l:parseFloat(x[3]),c:parseFloat(x[4])}));
 }
 let b=bougies[bougies.length-2], prev=bougies[bougies.length-3];
-let sma = bougies.slice(-11,-1).reduce((a,x)=>a+x.c,0)/10;
-let tendance = b.c > sma ? "HAUSSIERE" : "BAISSIERE";
+let sma=bougies.slice(-11,-1).reduce((a,x)=>a+x.c,0)/10;
+let tendance=b.c>sma?"HAUSSIERE":"BAISSIERE";
 document.getElementById('tendanceTxt').innerText="Tendance : "+tendance+" (SMA10: "+sma.toFixed(2)+")";
 document.getElementById('tendanceTxt').style.color=tendance==="HAUSSIERE"?"#00ff88":"#ff4444";
 derniere={...b,paire,tf};
@@ -158,11 +162,11 @@ let sig=document.getElementById('signal'), det=document.getElementById('detail')
 let figure="", s="", risque=0;
 if(corps<tot*0.2){figure="DOJI";sig.className='signal wait';sig.innerText="➕ DOJI - ATTENDS";det.innerText="Personne ne sait.";s="";}
 else if(mB>corps*2 && mH<corps*0.5){
-if(tendance!=="HAUSSIERE"){figure="MARTEAU CONTRE-TENDANCE";sig.className='signal wait';sig.innerText="⏳ MARTEAU MAIS BAISSIER - ATTENDS";s="";det.innerText="Piège. Attends.";}
+if(tendance!=="HAUSSIERE"){figure="MARTEAU CONTRE";sig.className='signal wait';sig.innerText="⏳ MARTEAU MAIS BAISSIER - ATTENDS";s="";det.innerText="Piège. Attends.";}
 else{figure="MARTEAU";sig.className='signal buy';sig.innerText="🔨 MARTEAU - HAUSSE";sl=b.l;risque=b.c-sl;tp1=b.c+risque*1;tp=b.c+risque*2;s="ACHAT";det.innerText="Marteau + tendance = OK.";}
 }
 else if(mH>corps*2 && mB<corps*0.5){
-if(tendance!=="BAISSIERE"){figure="ETOILE CONTRE-TENDANCE";sig.className='signal wait';sig.innerText="⏳ ETOILE MAIS HAUSSIER - ATTENDS";s="";det.innerText="Piège. Attends.";}
+if(tendance!=="BAISSIERE"){figure="ETOILE CONTRE";sig.className='signal wait';sig.innerText="⏳ ETOILE MAIS HAUSSIER - ATTENDS";s="";det.innerText="Piège. Attends.";}
 else{figure="ETOILE FILANTE";sig.className='signal sell';sig.innerText="⭐ ETOILE - BAISSE";sl=b.h;risque=sl-b.c;tp1=b.c-risque*1;tp=b.c-risque*2;s="VENTE";det.innerText="Étoile + tendance = OK.";}
 }
 else if(b.c>b.o && prev.c<prev.o && b.c>prev.o && b.o<prev.c){
@@ -189,14 +193,14 @@ if(positionOuverte.sens==='ACHAT'){if(prixActuel<=positionOuverte.sl) fermerPosi
 else{if(prixActuel>=positionOuverte.sl) fermerPosition("SL");else if(prixActuel<=positionOuverte.tp) fermerPosition("TP2");else if(prixActuel<=positionOuverte.tp1 && !positionOuverte.tp1Touche){positionOuverte.tp1Touche=true;alert("✅ TP1 touché ! Ferme 50% dans MT5, laisse le reste pour TP2.");}}
 }
 dessiner();
-}catch(e){console.log(e); document.getElementById('paireLive').innerText="Erreur de connexion - Réessaie";}
+}catch(e){console.log(e);document.getElementById('paireLive').innerText="Erreur de connexion - Réessaie";}
 }
 function ouvrirPosition(choix){
 if(positionOuverte){alert("Tu as déjà une position !");return;}
 if(!sens){alert("⛔ BLOQUÉ : Le robot dit ATTENDS.");return;}
 if((choix==='ACHAT' && sens==='VENTE') || (choix==='VENTE' && sens==='ACHAT')){alert("⛔ BLOQUÉ : Robot dit "+sens);return;}
 let mise=parseFloat(document.getElementById('mise').value)||5000;
-positionOuverte={sens:choix, entree:derniere.c, mise:mise, figure:derniere.figure, sl:sl, tp1:tp1, tp:tp, tp1Touche:false};
+positionOuverte={sens:choix,entree:derniere.c,mise:mise,figure:derniere.figure,sl:sl,tp1:tp1,tp:tp,tp1Touche:false};
 document.getElementById('posSens').innerText=choix;
 document.getElementById('posEntree').innerText=derniere.c.toFixed(2)+" $";
 document.getElementById('posInfo').innerText=`${choix} à ${derniere.c.toFixed(2)} | SL ${sl.toFixed(2)} | TP1 ${tp1.toFixed(2)} | TP2 ${tp.toFixed(2)} | ${derniere.figure}`;
@@ -214,7 +218,7 @@ tr.innerHTML=`<td>${new Date().toLocaleTimeString()}</td><td>${positionOuverte.s
 alert(`${motif} - ${gain>=0?'✅ GAGNÉ +':'❌ PERDU '}${fmt(gain)}\nSolde: ${fmt(solde)}`);
 positionOuverte=null;document.getElementById('posSens').innerText="---";document.getElementById('posEntree').innerText="---";document.getElementById('posGain').innerText="0 Ar";document.getElementById('posInfo').innerText="Position fermée.";document.getElementById('cardPos').classList.remove('pos-ouverte');maj();
 }
-function demarrer(){if(timer) clearInterval(timer); analyser(); timer=setInterval(analyser,15000); alert("Robot V4 démarré !");}
+function demarrer(){if(timer) clearInterval(timer); analyser(); timer=setInterval(analyser,15000); alert("Robot V4.1 démarré !");}
 function copierTout(){let txt=`SL: ${sl.toFixed(2)} | TP1: ${tp1.toFixed(2)} | TP2: ${tp.toFixed(2)} | Figure: ${derniere.figure} | Prix: ${derniere.c}`;navigator.clipboard.writeText(txt).then(()=>{});}
 function ouvrirMT5(){window.location.href="metatrader5://";setTimeout(()=>{window.open("https://play.google.com/store/apps/details?id=net.metaquotes.metatrader5","_blank");},800);}
 maj();
