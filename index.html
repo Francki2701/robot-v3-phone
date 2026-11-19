@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>ROBOT V3 PHONE - BOUGIE MADA</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0a0a1a;color:#fff;font-family:Arial;padding:8px;padding-bottom:120px}
+.top{background:linear-gradient(135deg,#ffcc00,#00ff88);padding:14px;border-radius:16px;color:#000;text-align:center;position:sticky;top:0;z-index:10}
+.top h1{margin:0;font-size:20px}
+.top p{margin:4px 0;font-size:12px}
+.card{background:#1a1a2e;padding:12px;border-radius:16px;margin:10px 0}
+select,input{width:100%;padding:14px;border-radius:12px;border:1px solid #444;background:#000;color:#fff;margin:6px 0;font-size:16px}
+button{border:0;border-radius:14px;font-weight:900;cursor:pointer}
+.prix{font-size:36px;font-weight:900;text-align:center;line-height:1}
+.signal{font-size:20px;font-weight:900;padding:16px;border-radius:14px;text-align:center;margin:10px 0}
+.buy{background:#00ff88;color:#000}.sell{background:#ff4444;color:#fff}.wait{background:#333;color:#fff}
+.flex{display:flex;gap:8px}.flex>div{flex:1;background:#000;padding:10px;border-radius:12px;text-align:center}
+.big{font-size:18px;font-weight:900}.green{color:#00ff88}.red{color:#ff4444}.yellow{color:#ffcc00}
+canvas{width:100%;background:#000;border-radius:12px}
+.small{font-size:12px;color:#aaa;text-align:center}
+.sl{color:#ff4444;font-weight:900;font-size:18px}.tp{color:#00ff88;font-weight:900;font-size:18px}
+/* GROS BOUTONS EN BAS - TOUJOURS VISIBLES */
+.barre-bas{position:fixed;bottom:0;left:0;right:0;background:#111;padding:10px;display:flex;gap:10px;z-index:99;border-top:2px solid #333}
+.btn-buy{flex:1;background:#00ff88;color:#000;padding:18px 5px;font-size:22px;line-height:1.1}
+.btn-sell{flex:1;background:#ff4444;color:#fff;padding:18px 5px;font-size:22px;line-height:1.1}
+.btn-buy small,.btn-sell small{font-size:11px;font-weight:400;display:block}
+.btn-mt5{width:100%;background:#007bff;color:#fff;padding:14px;font-size:16px;margin-top:8px}
+.btn-copy{width:100%;background:#ffcc00;color:#000;padding:14px;font-size:16px;margin-top:8px}
+table{width:100%;font-size:12px;border-collapse:collapse}td,th{padding:6px;border-bottom:1px solid #333;text-align:center}
+.pos-ouverte{border:2px solid #ffcc00;background:#2a2a00 !important}
+</style>
+</head>
+<body>
+
+<div class="top">
+<h1>🤖 ROBOT V3 PHONE</h1>
+<p>BOUGIE MADA - Spécial Téléphone - SANS PC</p>
+<p>⚠️ DÉMO UNIQUEMENT - Ne mets pas d'argent réel</p>
+</div>
+
+<div class="card">
+<div class="flex">
+<div><div class="small">SOLDE DÉMO</div><div class="big yellow" id="solde">100000 Ar</div></div>
+<div><div class="small">GAIN</div><div class="big green" id="gain">+0 Ar</div></div>
+<div><div class="small">RÉUSSITE</div><div class="big" id="winrate">0%</div></div>
+</div>
+</div>
+
+<div class="card">
+<div class="flex">
+<select id="paire"><option value="BTCUSDT">BTC / USDT</option><option value="ETHUSDT">ETH / USDT</option><option value="EURUSDT">EUR / USDT - Comme EURUSD MT5</option><option value="SOLUSDT">SOL / USDT</option></select>
+<select id="tf"><option value="1m">1 min</option><option value="5m" selected>5 min</option><option value="15m">15 min</option></select>
+</div>
+<input id="mise" type="number" value="5000" placeholder="Mise en Ar">
+<button style="width:100%;background:#00ff88;padding:15px;font-size:18px" onclick="demarrer()">▶️ DÉMARRER LE ROBOT</button>
+</div>
+
+<div class="card">
+<div class="prix" id="prixLive">--- $</div>
+<div class="small" id="paireLive">En attente...</div>
+<canvas id="chart" width="350" height="180"></canvas>
+<div id="signal" class="signal wait">ROBOT ARRÊTÉ</div>
+<p id="detail" style="text-align:center"></p>
+<div class="flex">
+<div><div class="small">🛑 STOP LOSS</div><div class="sl" id="slVal">---</div><button style="background:#333;color:#fff;padding:8px;width:100%;margin-top:5px" onclick="copier('sl')">📋 Copier SL</button></div>
+<div><div class="small">🎯 TAKE PROFIT</div><div class="tp" id="tpVal">---</div><button style="background:#333;color:#fff;padding:8px;width:100%;margin-top:5px" onclick="copier('tp')">📋 Copier TP</button></div>
+</div>
+<p id="conseil" class="small"></p>
+</div>
+
+<div class="card" id="cardPos">
+<h3 style="margin:0;text-align:center">📍 TA POSITION EN COURS</h3>
+<p style="text-align:center" id="posInfo">Aucune position. Attends une figure.</p>
+<div class="flex">
+<div><div class="small">SENS</div><div class="big" id="posSens">---</div></div>
+<div><div class="small">ENTRÉE</div><div class="big" id="posEntree">---</div></div>
+<div><div class="small">GAIN LIVE</div><div class="big" id="posGain">0 Ar</div></div>
+</div>
+<button style="width:100%;background:#ff4444;color:#fff;padding:14px;font-size:16px;margin-top:10px" onclick="fermerPosition('Manuel')">❌ FERMER MA POSITION</button>
+</div>
+
+<div class="card">
+<button class="btn-mt5" onclick="ouvrirMT5()">📱 OUVRIR MT5 MAINTENANT</button>
+<button class="btn-copy" onclick="copierTout()">📋 COPIER SL + TP POUR MT5</button>
+<p class="small">Quand tu cliques BUY ou SELL en bas, le robot copie SL et TP, et t'ouvre MT5. Tu n'as plus qu'à coller dans MT5.</p>
+</div>
+
+<div class="card">
+<h3>📊 Historique Démo</h3>
+<table><tr><th>Heure</th><th>Sens</th><th>Figure</th><th>Résultat</th></tr><tbody id="hist"></tbody></table>
+</div>
+
+<div class="card">
+<h3>📖 Comment utiliser sur téléphone, étape par étape :</h3>
+<p><b>1.</b> Ouvre MT5 et Robot côte à côte : Mets Robot en haut, MT5 en bas, ou utilise "Écran partagé" sur ton téléphone.</p>
+<p><b>2.</b> Robot dit <b>MARTEAU</b> → Clique <b>🟢 BUY</b> en bas. Il t'ouvre MT5.</p>
+<p><b>3.</b> Dans MT5, clique <b>BUY</b>, colle le SL et TP que le robot a copié.</p>
+<p><b>4.</b> Reviens dans Robot, tu vois ton gain qui monte en direct.</p>
+<p><b>5.</b> Si ça touche TP, le robot te dit GAGNÉ. Si ça touche SL, il te dit PERDU, mais petit.</p>
+<p>❌ Ne trade jamais si le robot dit ATTENDS.</p>
+</div>
+
+<!-- BARRE GROS BOUTONS EN BAS -->
+<div class="barre-bas">
+<button class="btn-buy" onclick="ouvrirPosition('ACHAT')">🟢 BUY<small>Je pense que ça MONTE</small></button>
+<button class="btn-sell" onclick="ouvrirPosition('VENTE')">🔴 SELL<small>Je pense que ça DESCEND</small></button>
+</div>
+
+<script>
+let timer=null, solde=100000, gainTotal=0, nb=0, wins=0;
+let derniere={o:0,h:0,l:0,c:0,figure:"",paire:""}, sl=0, tp=0, sens="";
+let bougies=[], positionOuverte=null;
+
+function fmt(n){return Math.round(n).toLocaleString('fr-FR')+" Ar";}
+function maj(){
+document.getElementById('solde').innerText=fmt(solde);
+document.getElementById('gain').innerText=(gainTotal>=0?"+":"")+fmt(gainTotal);
+document.getElementById('gain').className='big '+(gainTotal>=0?'green':'red');
+document.getElementById('winrate').innerText=nb?Math.round(wins/nb*100)+"%":"0%";
+}
+function dessiner(){
+let cv=document.getElementById('chart'), ctx=cv.getContext('2d');
+ctx.clearRect(0,0,cv.width,cv.height);
+if(bougies.length<2) return;
+let highs=Math.max(...bougies.map(b=>b.h)), lows=Math.min(...bougies.map(b=>b.l));
+let range=highs-lows||1, w=cv.width/bougies.length;
+bougies.forEach((b,i)=>{
+let x=i*w+w/2;
+let yH=cv.height-((b.h-lows)/range)*(cv.height-20)-10;
+let yL=cv.height-((b.l-lows)/range)*(cv.height-20)-10;
+let yO=cv.height-((b.o-lows)/range)*(cv.height-20)-10;
+let yC=cv.height-((b.c-lows)/range)*(cv.height-20)-10;
+ctx.strokeStyle=b.c>=b.o?'#00ff88':'#ff4444';
+ctx.beginPath();ctx.moveTo(x,yH);ctx.lineTo(x,yL);ctx.stroke();
+ctx.fillStyle=b.c>=b.o?'#00ff88':'#ff4444';
+ctx.fillRect(x-w*0.3, Math.min(yO,yC), w*0.6, Math.max(2,Math.abs(yC-yO)));
+});
+if(sl>0){let y=cv.height-((sl-lows)/range)*(cv.height-20)-10;ctx.strokeStyle='#ff4444';ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#ff4444';ctx.fillText('SL '+sl.toFixed(1),5,y-3);}
+if(tp>0){let y=cv.height-((tp-lows)/range)*(cv.height-20)-10;ctx.strokeStyle='#00ff88';ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#00ff88';ctx.fillText('TP '+tp.toFixed(1),5,y-3);}
+}
+async function analyser(){
+let paire=document.getElementById('paire').value, tf=document.getElementById('tf').value;
+try{
+let r=await fetch(`https://api.binance.com/api/v3/klines?symbol=${paire}&interval=${tf}&limit=20`);
+let d=await r.json();
+bougies=d.map(x=>({o:parseFloat(x[1]),h:parseFloat(x[2]),l:parseFloat(x[3]),c:parseFloat(x[4])}));
+let b=bougies[bougies.length-2], prev=bougies[bougies.length-3];
+derniere={...b,paire,tf};
+document.getElementById('prixLive').innerText=b.c.toFixed(2)+" $";
+document.getElementById('paireLive').innerText=paire+" - "+tf;
+let corps=Math.abs(b.c-b.o), mH=b.h-Math.max(b.o,b.c), mB=Math.min(b.o,b.c)-b.l, tot=b.h-b.l;
+let sig=document.getElementById('signal'), det=document.getElementById('detail');
+let figure="", s="";
+if(corps<tot*0.2){figure="DOJI";sig.className='signal wait';sig.innerText="➕ DOJI - ATTENDS";det.innerText="Personne ne sait.";s="";}
+else if(mB>corps*2 && mH<corps*0.5){figure="MARTEAU";sig.className='signal buy';sig.innerText="🔨 MARTEAU - HAUSSE";sl=b.l;tp=b.c+(b.c-sl)*2;s="ACHAT";det.innerText="Les acheteurs reviennent.";}
+else if(mH>corps*2 && mB<corps*0.5){figure="ETOILE FILANTE";sig.className='signal sell';sig.innerText="⭐ ETOILE - BAISSE";sl=b.h;tp=b.c-(sl-b.c)*2;s="VENTE";det.innerText="Les vendeurs reviennent.";}
+else if(b.c>b.o && prev.c<prev.o && b.c>prev.o && b.o<prev.c){figure="AVALEMENT HAUSSIER";sig.className='signal buy';sig.innerText="🟢 AVALEMENT HAUSSIER";sl=(b.o+b.c)/2;tp=b.c+(b.c-sl)*2;s="ACHAT";det.innerText="Avalement fort !";}
+else if(b.c<b.o && prev.c>prev.o && b.c<prev.o && b.o>prev.c){figure="AVALEMENT BAISSIER";sig.className='signal sell';sig.innerText="🔴 AVALEMENT BAISSIER";sl=(b.o+b.c)/2;tp=b.c-(sl-b.c)*2;s="VENTE";det.innerText="Avalement fort !";}
+else {figure="AUCUNE";sig.className='signal wait';sig.innerText="⏳ ATTENDS";det.innerText="Pas de figure claire.";s="";}
+derniere.figure=figure; sens=s;
+document.getElementById('slVal').innerText=sl?sl.toFixed(2):"---";
+document.getElementById('tpVal').innerText=tp?tp.toFixed(2):"---";
+document.getElementById('conseil').innerText=s?`Si tu fais ${s}: SL=${sl.toFixed(2)} TP=${tp.toFixed(2)} Risque 1, Gain 2.`:"Attends une figure.";
+// Verifier SL/TP si position ouverte
+if(positionOuverte){
+let prixActuel=b.c;
+let diff=positionOuverte.sens==='ACHAT'?(prixActuel-positionOuverte.entree):(positionOuverte.entree-prixActuel);
+let gainLive=Math.round(diff/positionOuverte.entree*positionOuverte.mise*20);
+document.getElementById('posGain').innerText=(gainLive>=0?'+':'')+fmt(gainLive);
+document.getElementById('posGain').style.color=gainLive>=0?'#00ff88':'#ff4444';
+if(positionOuverte.sens==='ACHAT'){if(prixActuel<=positionOuverte.sl) fermerPosition("SL"); else if(prixActuel>=positionOuverte.tp) fermerPosition("TP");}
+else {if(prixActuel>=positionOuverte.sl) fermerPosition("SL"); else if(prixActuel<=positionOuverte.tp) fermerPosition("TP");}
+}
+if(figure!=="AUCUNE" && figure!=="DOJI"){
+try{new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();}catch(e){}
+if(navigator.vibrate) navigator.vibrate([200,100,200]);
+}
+dessiner();
+}catch(e){}
+}
+function ouvrirPosition(choix){
+if(positionOuverte){alert("Tu as déjà une position ! Ferme-la d'abord.");return;}
+if(!sens){alert("Attends une figure ! Le robot dit ATTENDS.");return;}
+// Si tu cliques BUY alors que le robot dit VENTE, on te prévient
+if((choix==='ACHAT' && sens==='VENTE') || (choix==='VENTE' && sens==='ACHAT')){
+if(!confirm("⚠️ Attention ! Le robot dit "+sens+" mais tu veux faire "+choix+". Tu es sûr ?")) return;
+}
+let mise=parseFloat(document.getElementById('mise').value)||5000;
+positionOuverte={sens:choix, entree:derniere.c, mise:mise, figure:derniere.figure, sl:sl, tp:tp};
+document.getElementById('posSens').innerText=choix;
+document.getElementById('posSens').style.color=choix==='ACHAT'?'#00ff88':'#ff4444';
+document.getElementById('posEntree').innerText=derniere.c.toFixed(2)+" $";
+document.getElementById('posInfo').innerText=`Position ${choix} ouverte à ${derniere.c.toFixed(2)} | SL ${sl.toFixed(2)} | TP ${tp.toFixed(2)} | ${derniere.figure}`;
+document.getElementById('cardPos').classList.add('pos-ouverte');
+copierTout();
+setTimeout(ouvrirMT5, 500);
+}
+function fermerPosition(motif="Manuel"){
+if(!positionOuverte) return;
+let prixSortie=derniere.c;
+let gain=0;
+if(motif==="TP") gain=positionOuverte.mise*2;
+else if(motif==="SL") gain=-positionOuverte.mise;
+else {
+let diff=positionOuverte.sens==='ACHAT'?(prixSortie-positionOuverte.entree):(positionOuverte.entree-prixSortie);
+gain=Math.round(diff/positionOuverte.entree*positionOuverte.mise*20);
+}
+solde+=gain;gainTotal+=gain;nb++;if(gain>0)wins++;
+let hist=document.getElementById('hist');
+let tr=document.createElement('tr');
+tr.innerHTML=`<td>${new Date().toLocaleTimeString()}</td><td>${positionOuverte.sens}</td><td>${positionOuverte.figure}-${motif}</td><td style="color:${gain>=0?'#00ff88':'#ff4444'}">${gain>=0?'+':''}${fmt(gain)}</td>`;
+hist.prepend(tr);
+alert(`${motif} - ${gain>=0?'✅ GAGNÉ +':'❌ PERDU '}${fmt(gain)}\nSolde: ${fmt(solde)}`);
+positionOuverte=null;
+document.getElementById('posSens').innerText="---";
+document.getElementById('posEntree').innerText="---";
+document.getElementById('posGain').innerText="0 Ar";
+document.getElementById('posInfo').innerText="Position fermée. Attends la prochaine figure.";
+document.getElementById('cardPos').classList.remove('pos-ouverte');
+maj();
+}
+function demarrer(){if(timer) clearInterval(timer); analyser(); timer=setInterval(analyser,15000); alert("Robot PHONE démarré ! Laisse l'onglet ouvert.");}
+function copier(type){
+let val = type==='sl'? sl.toFixed(2) : tp.toFixed(2);
+navigator.clipboard.writeText(val).then(()=>alert(type.toUpperCase()+" copié: "+val+" - Colle-le dans MT5"));
+}
+function copierTout(){
+let txt=`SL: ${sl.toFixed(2)} | TP: ${tp.toFixed(2)} | Figure: ${derniere.figure} | Prix: ${derniere.c}`;
+navigator.clipboard.writeText(txt).then(()=>{});
+}
+function ouvrirMT5(){
+// Essaie d'ouvrir MT5, sinon va sur Play Store
+window.location.href="metatrader5://";
+setTimeout(()=>{ window.open("https://play.google.com/store/apps/details?id=net.metaquotes.metatrader5","_blank"); }, 800);
+}
+maj();
+</script>
+</body>
+</html>
